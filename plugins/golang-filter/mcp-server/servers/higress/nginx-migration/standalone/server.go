@@ -88,7 +88,7 @@ func (s *MCPServer) handleInitialize(msg MCPMessage) MCPMessage {
 	supportedVersions := []string{"2025-06-18", "2025-03-26", "2024-11-05"}
 
 	// Find the best matching version (use requested if supported, otherwise latest supported)
-	selectedVersion := supportedVersions[len(supportedVersions)-1] // default to oldest
+	selectedVersion := supportedVersions[0] // default to latest
 	for _, v := range supportedVersions {
 		if v == requestedVersion {
 			selectedVersion = requestedVersion
