@@ -547,6 +547,7 @@ func (s *MCPServer) AddNotificationHandler(
 // SupportedProtocolVersions lists all protocol versions supported by this server
 // Order is from newest to oldest
 var SupportedProtocolVersions = []string{
+	"2025-11-25",
 	"2025-06-18",
 	"2025-03-26",
 	"2024-11-05",
