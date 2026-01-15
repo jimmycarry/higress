@@ -29,11 +29,31 @@ func (s *MCPServer) HandleMessage(msg MCPMessage) MCPMessage {
 }
 
 func (s *MCPServer) handleInitialize(msg MCPMessage) MCPMessage {
+	// Get requested protocol version from client
+	requestedVersion := "2024-11-05" // default
+	if params, ok := msg.Params.(map[string]interface{}); ok {
+		if pv, ok := params["protocolVersion"].(string); ok {
+			requestedVersion = pv
+		}
+	}
+
+	// Supported protocol versions (newest first)
+	supportedVersions := []string{"2025-11-25", "2025-06-18", "2025-03-26", "2024-11-05"}
+
+	// Find the best matching version (use requested if supported, otherwise latest supported)
+	selectedVersion := supportedVersions[0] // default to latest
+	for _, v := range supportedVersions {
+		if v == requestedVersion {
+			selectedVersion = requestedVersion
+			break
+		}
+	}
+
 	return MCPMessage{
 		JSONRPC: "2.0",
 		ID:      msg.ID,
 		Result: map[string]interface{}{
-			"protocolVersion": "2024-11-05",
+			"protocolVersion": selectedVersion,
 			"capabilities": map[string]interface{}{
 				"tools": map[string]interface{}{
 					"listChanged": true,

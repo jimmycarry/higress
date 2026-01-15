@@ -544,6 +544,27 @@ func (s *MCPServer) AddNotificationHandler(
 	s.notificationHandlers[method] = handler
 }
 
+// SupportedProtocolVersions lists all protocol versions supported by this server
+// Order is from newest to oldest
+var SupportedProtocolVersions = []string{
+	"2025-11-25",
+	"2025-06-18",
+	"2025-03-26",
+	"2024-11-05",
+}
+
+// selectProtocolVersion returns the appropriate protocol version to use
+// If the requested version is supported, return it; otherwise return the latest supported
+func selectProtocolVersion(requestedVersion string) string {
+	for _, v := range SupportedProtocolVersions {
+		if v == requestedVersion {
+			return requestedVersion
+		}
+	}
+	// If requested version is not in our list, use the latest supported
+	return SupportedProtocolVersions[0]
+}
+
 func (s *MCPServer) handleInitialize(
 	ctx context.Context,
 	id interface{},
@@ -584,8 +605,11 @@ func (s *MCPServer) handleInitialize(
 		capabilities.Logging = &struct{}{}
 	}
 
+	// Select the appropriate protocol version based on client request
+	selectedVersion := selectProtocolVersion(request.Params.ProtocolVersion)
+
 	result := mcp.InitializeResult{
-		ProtocolVersion: request.Params.ProtocolVersion,
+		ProtocolVersion: selectedVersion,
 		ServerInfo: mcp.Implementation{
 			Name:    s.name,
 			Version: s.version,
